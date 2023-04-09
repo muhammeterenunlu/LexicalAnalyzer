@@ -6,6 +6,8 @@ import java.util.List;
 
 public class PPLLScanner {
 
+    public static boolean errorCountered =false;
+
     public static void main(String[] args) {
         // Check if the correct number of arguments is provided
         if (args.length != 1) {
@@ -62,6 +64,10 @@ public class PPLLScanner {
                 if (newIndex != -1) {
                     found = true;
                     tokens.add(new Token(tokenType, lineNumber, position));
+                    if(errorCountered){
+                        String errorToken =input.substring(index, newIndex);
+                        throw new LexicalException("LEXICAL ERROR [" +lineNumber+":"+ position+ "]: Invalid token: " + errorToken);
+                    }
                     position += newIndex - index;
                     index = newIndex;
                     break;

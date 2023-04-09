@@ -34,7 +34,7 @@ public enum TokenType {
     }
 
     // Check if the input string matches the token type at the given index
-    public int match(String input, int index) {
+    public int match(String input, int index) throws LexicalException {
         // If the token type has a literal, check if the input starts with the literal at the given index
         if (literal != null && input.startsWith(literal, index)) {
             return index + literal.length();
@@ -95,6 +95,16 @@ public enum TokenType {
 
         // If the number has digits, return the new index; otherwise, return -1
         if (hasDigits) {
+            if(Character.isLetter(input.charAt(index))){
+                index++;
+                while (true){
+                    Character c = input.charAt(index);
+                    if(c.equals(' '))
+                        break;
+                    index++;
+                }
+                PPLLScanner.errorCountered=true;
+            }
             return index;
         }
 
