@@ -8,12 +8,12 @@ public enum TokenType {
     NUMBER, 
     BOOLEAN("true|false"),
     CHAR, 
-    STRING, 
-    DEFINE("define"), 
-    LET("let"), 
-    COND("cond"), 
-    IF("if"), 
-    BEGIN("begin"), 
+    STRING,
+    DEFINE("define "),
+    LET("let "),
+    COND("cond "),
+    IF("if "),
+    BEGIN("begin "),
     IDENTIFIER;
 
     private final String literal; // The literal representation of the token type
@@ -71,20 +71,34 @@ public enum TokenType {
     private int matchNumber(String input, int index) {
         boolean hasDigits = false;
         boolean hasDecimal = false;
+        boolean hasExponent = false;
+        boolean isHex = false;
+        boolean isBinary = false;
 
         // Check for a sign character (optional)
         if (index < input.length() && (input.charAt(index) == '-' || input.charAt(index) == '+')) {
             index++;
         }
 
+        // Check for hexadecimal and binary prefixes
+        if (index + 1 < input.length() && input.charAt(index) == '0') {
+            if (input.charAt(index + 1) == 'x' || input.charAt(index + 1) == 'X') {
+                isHex = true;
+                index += 2;
+            } else if (input.charAt(index + 1) == 'b' || input.charAt(index + 1) == 'B') {
+                isBinary = true;
+                index += 2;
+            }
+        }
+
         // Match the integer part
-        while (index < input.length() && Character.isDigit(input.charAt(index))) {
+        while (index < input.length() && isNumberChar(input.charAt(index), isHex, isBinary)) {
             hasDigits = true;
             index++;
         }
 
         // Match the decimal point and fractional part (optional)
-        if (index < input.length() && input.charAt(index) == '.' && !hasDecimal) {
+        if (!isHex && !isBinary && index < input.length() && input.charAt(index) == '.' && !hasDecimal) {
             hasDecimal = true;
             index++;
             while (index < input.length() && Character.isDigit(input.charAt(index))) {
@@ -93,14 +107,26 @@ public enum TokenType {
             }
         }
 
+        // Match the exponent part (optional)
+        if (!isHex && !isBinary && index < input.length() && (input.charAt(index) == 'e' || input.charAt(index) == 'E') && !hasExponent) {
+            hasExponent = true;
+            index++;
+
+            if (index < input.length() && (input.charAt(index) == '-' || input.charAt(index) == '+')) {
+                index++;
+            }
+
+            while (index < input.length() && Character.isDigit(input.charAt(index))) {
+                hasDigits = true;
+                index++;
+            }
+        }
+
         // If the number has digits, return the new index; otherwise, return -1
         if (hasDigits) {
-            if(Character.isLetter(input.charAt(index))){
-                index++;
-                while (true){
-                    Character c = input.charAt(index);
-                    if(c.equals(' '))
-                        break;
+            // If the number has non valid ending
+            if (index < input.length() && !Character.isWhitespace(input.charAt(index)) && !isNumberChar(input.charAt(index), isHex, isBinary) && !(input.charAt(index) == '.' && !hasDecimal) && !(input.charAt(index) == 'e' && !hasExponent)&&!(Character.compare(input.charAt(index),')')==0) && !(Character.compare(input.charAt(index),']')==0)) {
+                while (index < input.length() && !Character.isWhitespace(input.charAt(index))) {
                     index++;
                 }
                 PPLLScanner.errorCountered=true;
@@ -109,7 +135,7 @@ public enum TokenType {
         }
 
         return -1;
-    }        
+    }
 
     // Match a character literal in the input string at the given index
     private int matchChar(String input, int index) {
@@ -150,9 +176,16 @@ public enum TokenType {
         // Check for a valid identifier start character
         if (index < input.length() && isIdentifierStartChar(input.charAt(index))) {
             index++;
-            // Match subsequent identifier characters
             while (index < input.length() && isIdentifierChar(input.charAt(index))) {
                 index++;
+            }
+
+            // If identifier ends with non valid character
+            if (index < input.length() && !Character.isWhitespace(input.charAt(index)) && !isIdentifierChar(input.charAt(index))&& !(Character.compare(input.charAt(index),')')==0)&&!(Character.compare(input.charAt(index),']')==0) ) {
+                while (index < input.length() && !Character.isWhitespace(input.charAt(index))) {
+                    index++;
+                }
+                PPLLScanner.errorCountered=true;
             }
             return index;
         }
@@ -167,5 +200,15 @@ public enum TokenType {
     // Check if a character is a valid identifier character
     private boolean isIdentifierChar(char c) {
         return Character.isLetterOrDigit(c) || c == '_' || c == '.' || c == '+' || c == '-' || c == '!';
+    }
+
+    private boolean isNumberChar(char c, boolean isHex, boolean isBinary) {
+        if (isBinary) {
+            return c == '0' || c == '1';
+        } else if (isHex) {
+            return Character.isDigit(c) || "abcdefABCDEF".indexOf(c) >= 0;
+        } else {
+            return Character.isDigit(c);
+        }
     }
 }
