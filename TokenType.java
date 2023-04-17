@@ -1,13 +1,13 @@
 public enum TokenType {
-    LEFTPAR("("), 
-    RIGHTPAR(")"), 
-    LEFTSQUAREB("["), 
+    LEFTPAR("("),
+    RIGHTPAR(")"),
+    LEFTSQUAREB("["),
     RIGHTSQUAREB("]"),
-    LEFTCURLYB("{"), 
+    LEFTCURLYB("{"),
     RIGHTCURLYB("}"),
-    NUMBER, 
+    NUMBER,
     BOOLEAN("true|false"),
-    CHAR, 
+    CHAR,
     STRING,
     DEFINE("define "),
     LET("let "),
@@ -125,11 +125,11 @@ public enum TokenType {
         // If the number has digits, return the new index; otherwise, return -1
         if (hasDigits) {
             // If the number has non valid ending
-            if (index < input.length() && !Character.isWhitespace(input.charAt(index)) && !isNumberChar(input.charAt(index), isHex, isBinary) && !(input.charAt(index) == '.' && !hasDecimal) && !(input.charAt(index) == 'e' && !hasExponent)&&!(Character.compare(input.charAt(index),')')==0) && !(Character.compare(input.charAt(index),']')==0)) {
+            if (index < input.length() && !Character.isWhitespace(input.charAt(index)) && !isNumberChar(input.charAt(index), isHex, isBinary) && !(input.charAt(index) == '.' && !hasDecimal) && !(input.charAt(index) == 'e' && !hasExponent) && !(Character.compare(input.charAt(index), ')') == 0) && !(Character.compare(input.charAt(index), ']') == 0)) {
                 while (index < input.length() && !Character.isWhitespace(input.charAt(index))) {
                     index++;
                 }
-                PPLLScanner.errorCountered=true;
+                PPLLScanner.errorCountered = true;
             }
             return index;
         }
@@ -147,7 +147,14 @@ public enum TokenType {
                 index++;
                 // Check for the closing single quote
                 if (index < input.length() && input.charAt(index) == '\'') {
-                    return index + 1;
+                    index++;
+                    if (index < input.length() && !Character.isWhitespace(input.charAt(index)) && !(Character.compare(input.charAt(index), ')') == 0) && !(Character.compare(input.charAt(index), ']') == 0)) {
+                        while (index < input.length() && !Character.isWhitespace(input.charAt(index))) {
+                            index++;
+                        }
+                        PPLLScanner.errorCountered = true;
+                    }
+                    return index;
                 }
             }
         }
@@ -165,7 +172,16 @@ public enum TokenType {
             }
             // Check for the closing double quote
             if (index < input.length() && input.charAt(index) == '\"') {
-                return index + 1;
+                index++;
+                if (index < input.length() && !Character.isWhitespace(input.charAt(index)) && !(Character.compare(input.charAt(index), ')') == 0) && !(Character.compare(input.charAt(index), ']') == 0)) {
+                    while (index < input.length() && !Character.isWhitespace(input.charAt(index))) {
+                        index++;
+                    }
+                    PPLLScanner.errorCountered = true;
+                }
+                return index;
+
+
             }
         }
         return -1;
@@ -181,11 +197,11 @@ public enum TokenType {
             }
 
             // If identifier ends with non valid character
-            if (index < input.length() && !Character.isWhitespace(input.charAt(index)) && !isIdentifierChar(input.charAt(index))&& !(Character.compare(input.charAt(index),')')==0)&&!(Character.compare(input.charAt(index),']')==0) ) {
+            if (index < input.length() && !Character.isWhitespace(input.charAt(index)) && !isIdentifierChar(input.charAt(index)) && !(Character.compare(input.charAt(index), ')') == 0) && !(Character.compare(input.charAt(index), ']') == 0)) {
                 while (index < input.length() && !Character.isWhitespace(input.charAt(index))) {
                     index++;
                 }
-                PPLLScanner.errorCountered=true;
+                PPLLScanner.errorCountered = true;
             }
             return index;
         }
@@ -201,6 +217,7 @@ public enum TokenType {
     private boolean isIdentifierChar(char c) {
         return Character.isLetterOrDigit(c) || c == '_' || c == '.' || c == '+' || c == '-' || c == '!';
     }
+
 
     private boolean isNumberChar(char c, boolean isHex, boolean isBinary) {
         if (isBinary) {
