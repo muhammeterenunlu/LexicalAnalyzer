@@ -32,7 +32,7 @@ public class PPLLScanner {
     }
 
     // Read the contents of a file into a string
-    private static String readFile(String fileName) throws IOException {
+    public static String readFile(String fileName) throws IOException {
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             StringBuilder sb = new StringBuilder();
             String line;
@@ -45,8 +45,13 @@ public class PPLLScanner {
         }
     }
 
+    public static List<Token> tokenizeForParser(String fileName) throws IOException, LexicalException {
+        String input = readFile(fileName);
+        return tokenize(input);
+    }
+
     // Tokenize the input string
-    private static List<Token> tokenize(String input) throws LexicalException {
+    public static List<Token> tokenize(String input) throws LexicalException {
         List<Token> tokens = new ArrayList<>();
         int lineNumber = 1;
         int position = 1;
@@ -88,6 +93,8 @@ public class PPLLScanner {
                 }
             }
         }
+        tokens.add(new Token(TokenType.EOF, lineNumber, position));
+
         return tokens;
     }
 

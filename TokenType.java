@@ -14,7 +14,9 @@ public enum TokenType {
     COND("cond "),
     IF("if "),
     BEGIN("begin "),
+    EOF,
     IDENTIFIER;
+
 
     private final String literal; // The literal representation of the token type
 

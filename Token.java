@@ -1,7 +1,7 @@
 public class Token {
-    private final TokenType type;
-    private final int lineNumber;
-    private final int position;
+    public final TokenType type;
+    public final int lineNumber;
+    public final int position;
 
     public Token(TokenType type, int lineNumber, int position) {
         this.type = type;
