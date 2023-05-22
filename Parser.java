@@ -5,6 +5,9 @@ import java.util.List;
 
 public class Parser {
 
+
+    private int indentLevel = 0;
+
     private Token currentToken;
 
     private List<Token> tokens;
@@ -21,14 +24,16 @@ public class Parser {
     }
     private Token getNextToken() {
         if (currentTokenIndex < tokens.size()) {
-            return tokens.get(currentTokenIndex++);
+            Token token= tokens.get(currentTokenIndex);
+            currentTokenIndex++;
+            return  token;
         } else {
             throw new IndexOutOfBoundsException("No more tokens available");
         }
     }
 
     public void parseProgram() {
-        while (currentToken.type != TokenType.EOF) {
+        if (currentToken.type != TokenType.EOF) {
             try {
                 parseTopLevelForm();
             } catch (SyntaxError | IOException e) {
@@ -59,12 +64,27 @@ public class Parser {
         parseDefinitionRight();
     }
 
-
     private void match(TokenType expectedType) throws SyntaxError {
-        Token currentToken = getNextToken();
         if (currentToken.type != expectedType) {
             throw new SyntaxError("Expected " + expectedType + " but found " + currentToken.type, currentToken);
         }
+
+        // Girinti ekle
+        for (int i = 0; i < indentLevel; i++) {
+            System.out.print("\t");
+        }
+
+        // Tokentype ve değerini yazdır
+        System.out.println("<" + currentToken.type + "> " + currentToken.toString());
+
+        // Parantezlerle işlem yaparken girintiyi artırın veya azaltın
+        if (expectedType == TokenType.LEFTPAR) {
+            indentLevel++;
+        } else if (expectedType == TokenType.RIGHTPAR) {
+            indentLevel--;
+        }
+
+        currentToken = getNextToken();
     }
     public void parseExpression() throws SyntaxError, IOException {
         if (currentToken.type == TokenType.IDENTIFIER ||
@@ -72,7 +92,7 @@ public class Parser {
                 currentToken.type == TokenType.CHAR ||
                 currentToken.type == TokenType.BOOLEAN ||
                 currentToken.type == TokenType.STRING) {
-            currentToken = getNextToken();
+            match(currentToken.type);
         } else if (currentToken.type == TokenType.LEFTPAR) {
             match(TokenType.LEFTPAR);
             parseExpr();
@@ -176,6 +196,7 @@ public class Parser {
             parseExpression();
             parseExpressions();
         }
+
     }
 
     public void parseVarDefs() throws IOException, SyntaxError {
@@ -206,7 +227,12 @@ public class Parser {
 
 
     public void parseEndExpression() throws IOException, SyntaxError {
-        if (currentToken.type != TokenType.EOF) {
+        if (currentToken.type == TokenType.IDENTIFIER ||
+                currentToken.type == TokenType.NUMBER ||
+                currentToken.type == TokenType.CHAR ||
+                currentToken.type == TokenType.BOOLEAN ||
+                currentToken.type == TokenType.STRING||
+                currentToken.type == TokenType.LEFTPAR) {
             parseExpression();
         }
     }
