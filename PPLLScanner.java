@@ -68,7 +68,8 @@ public class PPLLScanner {
                 int newIndex = tokenType.match(input, index);
                 if (newIndex != -1) {
                     found = true;
-                    tokens.add(new Token(tokenType, lineNumber, position));
+                    String value = input.substring(index, newIndex); // Extracting the value
+                    tokens.add(new Token(tokenType, lineNumber, position, value)); // Adding value to the token
                     if(errorCountered){
                         String errorToken =input.substring(index, newIndex);
                         throw new LexicalException("LEXICAL ERROR [" +lineNumber+":"+ position+ "]: Invalid token: " + errorToken);
@@ -93,7 +94,7 @@ public class PPLLScanner {
                 }
             }
         }
-        tokens.add(new Token(TokenType.EOF, lineNumber, position));
+        tokens.add(new Token(TokenType.EOF, lineNumber, position,""));
 
         return tokens;
     }

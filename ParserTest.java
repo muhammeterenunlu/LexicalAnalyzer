@@ -1,15 +1,15 @@
+
 import java.io.IOException;
 
 public class ParserTest {
+    public ParserTest() {
+    }
 
+    public static void main(String[] var0) throws LexicalException, IOException {
 
+        String fileName= "parserTest.ppll";
 
-    public static void main(String[] args) throws LexicalException, IOException {
-        Parser parser = new Parser("fibonacci.ppll");
-
-        parser.parseProgram();
-
-
-
+        Parser var1 = new Parser(fileName);
+        var1.parseProgram();
     }
 }

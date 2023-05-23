@@ -46,7 +46,7 @@ public class CustomTokenizer {
                 int newIndex = tokenType.match(input, index - 1);
                 if (newIndex != -1) {
                     // If a match is found, create a token and update the index and position
-                    Token token = new Token(tokenType, lineNumber, position);
+                    Token token = new Token(tokenType, lineNumber, position,"");
                     index = newIndex;
                     position += tokenType.length();
                     // Return the matched token
